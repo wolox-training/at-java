@@ -1,4 +1,4 @@
-package wolox.training;
+package wolox.training.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
