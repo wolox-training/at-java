@@ -13,28 +13,28 @@ public class Book {
     private long id;
 
     @Column()
-    private String Genre;
+    private String genre;
 
     @Column(nullable = false)
-    private String Author;
+    private String author;
 
     @Column(nullable = false)
-    private String Image;
+    private String image;
 
     @Column(nullable = false)
-    private String Title;
+    private String title;
 
     @Column(nullable = false)
-    private String Subtitle;
+    private String subtitle;
 
     @Column(nullable = false)
-    private String Publisher;
+    private String publisher;
 
     @Column(nullable = false)
-    private String Year;
+    private String year;
 
     @Column(nullable = false)
-    private int Pages;
+    private int pages;
 
     @Column(nullable = false)
     private String isbn;
@@ -47,52 +47,60 @@ public class Book {
         this.id = id;
     }
 
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
     public String getAuthor() {
-        return Author;
+        return author;
     }
 
     public void setAuthor(String author) {
-        Author = author;
+        this.author = author;
     }
 
     public String getImage() {
-        return Image;
+        return image;
     }
 
     public void setImage(String image) {
-        Image = image;
+        this.image = image;
     }
 
     public String getTitle() {
-        return Title;
+        return title;
     }
 
     public void setTitle(String title) {
-        Title = title;
+        this.title = title;
     }
 
     public String getSubtitle() {
-        return Subtitle;
+        return subtitle;
     }
 
     public void setSubtitle(String subtitle) {
-        Subtitle = subtitle;
+        this.subtitle = subtitle;
     }
 
     public String getPublisher() {
-        return Publisher;
+        return publisher;
     }
 
     public void setPublisher(String publisher) {
-        Publisher = publisher;
+        this.publisher = publisher;
     }
 
     public String getYear() {
-        return Year;
+        return year;
     }
 
     public void setYear(String year) {
-        Year = year;
+        this.year = year;
     }
 
     public String getIsbn() {
@@ -101,5 +109,13 @@ public class Book {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+    public int getPages() {
+        return pages;
+    }
+
+    public void setPages(int pages) {
+        this.pages = pages;
     }
 }
