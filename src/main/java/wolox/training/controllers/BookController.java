@@ -41,7 +41,7 @@ public class BookController {
     @PutMapping("/{id}")
     public Book update(@RequestBody Book book, @PathVariable Long id) {
         if (book.getId() != id) {
-            throw new BookIdMismatchException("The id does not match");
+            throw new BookIdMismatchException("The book id does not match");
         }
         if (!bookRepository.existsById(id)) {
             throw new BookNotFoundException();
