@@ -52,7 +52,7 @@ public class BookController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        if (bookRepository.existsById(id)) {
+        if (!bookRepository.existsById(id)) {
             throw new BookNotFoundException();
         }
 
