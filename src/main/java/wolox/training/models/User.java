@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import wolox.training.exceptions.BookAlreadyOwnedException;
 
+@Entity
 public class User {
 
     @Id
@@ -26,7 +28,7 @@ public class User {
     @Column(nullable = false)
     private LocalDate birthdate;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany
     @Column(nullable = false)
     private List<Book> books = new ArrayList<>();
 
@@ -71,12 +73,15 @@ public class User {
     }
 
     public void addBook(Book book) {
-        for(Book b : this.books) {
-            if (b.equals(book)) {
-                throw new BookAlreadyOwnedException(book);
-            }
+        if (this.books.contains(book)) {
+            throw new BookAlreadyOwnedException(book);
         }
+
         this.books.add(book);
+    }
+
+    public void removeBook(Book book) {
+        this.books.remove(book);
     }
 
 }
