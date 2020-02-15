@@ -43,7 +43,7 @@ public class BookController {
         if (book.getId() != id) {
             throw new BookIdMismatchException("The id does not match");
         }
-        if (bookRepository.existsById(id)) {
+        if (!bookRepository.existsById(id)) {
             throw new BookNotFoundException();
         }
 
