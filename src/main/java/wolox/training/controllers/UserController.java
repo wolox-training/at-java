@@ -60,17 +60,18 @@ public class UserController {
     @PostMapping("/{id}/books/{bookId}")
     public User addBook(@PathVariable Long id, @PathVariable Long bookId) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
-        Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
+        Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
 
         user.addBook(book);
         return userRepository.save(user);
     }
 
-    @DeleteMapping("/{id}/book/{bookId}")
+    @DeleteMapping("/{id}/books/{bookId}")
     public void deleteBook(@PathVariable Long id, @PathVariable Long bookId) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
-        Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
+        Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
 
         user.removeBook(book);
+        userRepository.save(user);
     }
 }
