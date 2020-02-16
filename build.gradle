@@ -42,6 +42,7 @@ dependencies {
     compile 'org.springframework.plugin:spring-plugin-core:1.2.0.RELEASE'
 
     compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
+    implementation 'junit:junit:4.12'
 }
 
 test {
