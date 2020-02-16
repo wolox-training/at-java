@@ -1,5 +1,7 @@
 package wolox.training.models;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@ApiModel(description = "Books on the library")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -17,6 +20,7 @@ public class Book {
     @Column()
     private String genre;
 
+    @ApiModelProperty(notes = "The book's author")
     @Column(nullable = false)
     private String author;
 

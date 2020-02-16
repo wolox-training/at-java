@@ -36,6 +36,11 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.4'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+    compile 'org.springframework.plugin:spring-plugin-core:1.2.0.RELEASE'
+
 }
 
 test {
