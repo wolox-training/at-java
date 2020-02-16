@@ -23,7 +23,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ BookIdMismatchException.class,
             UserIdMismatchException.class,
             ConstraintViolationException.class,
-            DataIntegrityViolationException.class })
+            DataIntegrityViolationException.class})
     public ResponseEntity<Object> handleBadRequest(
             Exception ex, WebRequest request) {
         return handleExceptionInternal(ex, ex.getLocalizedMessage(),

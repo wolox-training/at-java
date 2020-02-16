@@ -1,5 +1,6 @@
 package wolox.training.models;
 
+import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.Column;
@@ -40,7 +41,7 @@ public class Book {
     private String year;
 
     @Column(nullable = false)
-    private int pages;
+    private Integer pages;
 
     @Column(nullable = false)
     private String isbn;
@@ -66,6 +67,7 @@ public class Book {
     }
 
     public void setAuthor(String author) {
+        Preconditions.checkNotNull(author);
         this.author = author;
     }
 
@@ -74,14 +76,14 @@ public class Book {
     }
 
     public void setImage(String image) {
+        Preconditions.checkNotNull(image);
         this.image = image;
     }
-
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
+        Preconditions.checkNotNull(title);
         this.title = title;
     }
 
@@ -90,6 +92,7 @@ public class Book {
     }
 
     public void setSubtitle(String subtitle) {
+        Preconditions.checkNotNull(subtitle);
         this.subtitle = subtitle;
     }
 
@@ -98,6 +101,7 @@ public class Book {
     }
 
     public void setPublisher(String publisher) {
+        Preconditions.checkNotNull(publisher);
         this.publisher = publisher;
     }
 
@@ -106,6 +110,7 @@ public class Book {
     }
 
     public void setYear(String year) {
+        Preconditions.checkNotNull(year);
         this.year = year;
     }
 
@@ -113,7 +118,8 @@ public class Book {
         return pages;
     }
 
-    public void setPages(int pages) {
+    public void setPages(Integer pages) {
+        Preconditions.checkNotNull(pages);
         this.pages = pages;
     }
 
@@ -122,6 +128,8 @@ public class Book {
     }
 
     public void setIsbn(String isbn) {
+        Preconditions.checkNotNull(isbn);
         this.isbn = isbn;
     }
+
 }
