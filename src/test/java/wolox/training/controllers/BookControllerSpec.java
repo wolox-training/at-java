@@ -56,14 +56,14 @@ public class BookControllerSpec {
 
         ObjectMapper objectMapper = new ObjectMapper();
         String bookJSON = objectMapper.writeValueAsString(mockBook);
-        
+
         mvc.perform(MockMvcRequestBuilders.post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bookJSON))
                 .andExpect(status().isCreated())
                 .andDo(mvcResult -> {
                     String pepe = mvcResult.getResponse().getContentAsString();
-                   assert(mvcResult).equals(mockBook);
+                    assert(mvcResult).equals(mockBook);
                 });
                 /*.andExpect(MockMvcResultMatchers.jsonPath("$.genre", equalTo(mockBook.getGenre())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.author", equalTo(mockBook.getAuthor())))
