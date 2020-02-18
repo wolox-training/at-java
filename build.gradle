@@ -43,6 +43,8 @@ dependencies {
 
     compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
     implementation 'junit:junit:4.12'
+
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
 }
 
 test {

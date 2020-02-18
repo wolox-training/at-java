@@ -1,26 +1,25 @@
 package wolox.training.controllers;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import wolox.training.TrainingApplication;
+import wolox.training.mocks.MockBook;
 import wolox.training.models.Book;
 import wolox.training.repositories.BookRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BookController.class)
@@ -32,25 +31,48 @@ public class BookControllerSpec {
     private BookRepository repository;
 
     @Test
-    public void givenAnAuthor_thenReturnsBook () throws Exception {
-        Book mockBook = new Book();
-        mockBook.setAuthor("Dumas");
-        mockBook.setGenre("Adventure");
-        mockBook.setTitle("The three musketeers");
-        mockBook.setSubtitle("");
-        mockBook.setImage("http://image.png");
-        mockBook.setPublisher("B.B. Editors");
-        mockBook.setPages(700);
-        mockBook.setIsbn("9781567673067");
-        mockBook.setYear("1884");
-
+    public void onGet_givenAnAuthor_thenReturnsBook () throws Exception {
+        Book mockBook = MockBook.createOne();
         given(repository.findFirstByAuthor("Dumas")).willReturn(mockBook);
 
         mvc.perform(MockMvcRequestBuilders.get("/api/books/Dumas")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name", is(mockBook.getTitle())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.genre", equalTo(mockBook.getGenre())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.author", equalTo(mockBook.getAuthor())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.image", equalTo(mockBook.getImage())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title", equalTo(mockBook.getTitle())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.subtitle", equalTo(mockBook.getSubtitle())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.publisher", equalTo(mockBook.getPublisher())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.year", equalTo(mockBook.getYear())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pages", equalTo(mockBook.getPages())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.isbn", equalTo(mockBook.getIsbn())));
+    }
+
+    @Test
+    public void onPost_givenABook_thenCreatesNewBook () throws Exception {
+        Book mockBook = MockBook.createOne();
+        when(repository.save(mockBook)).thenReturn(mockBook);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String bookJSON = objectMapper.writeValueAsString(mockBook);
+        
+        mvc.perform(MockMvcRequestBuilders.post("/api/books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(bookJSON))
+                .andExpect(status().isCreated())
+                .andDo(mvcResult -> {
+                    String pepe = mvcResult.getResponse().getContentAsString();
+                   assert(mvcResult).equals(mockBook);
+                });
+                /*.andExpect(MockMvcResultMatchers.jsonPath("$.genre", equalTo(mockBook.getGenre())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.author", equalTo(mockBook.getAuthor())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.image", equalTo(mockBook.getImage())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title", equalTo(mockBook.getTitle())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.subtitle", equalTo(mockBook.getSubtitle())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.publisher", equalTo(mockBook.getPublisher())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.year", equalTo(mockBook.getYear())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.pages", equalTo(mockBook.getPages())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.isbn", equalTo(mockBook.getIsbn())));*/
     }
 }
-
