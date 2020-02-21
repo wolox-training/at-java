@@ -33,9 +33,11 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     testCompile 'com.h2database:h2:1.4.200'
 
-    compileOnly 'org.projectlombok:lombok:1.18.4'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+    compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
 }
 
 test {

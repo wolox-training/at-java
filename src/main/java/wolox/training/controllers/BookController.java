@@ -28,9 +28,9 @@ public class BookController {
 
     @GetMapping("/{author}")
     public Book findByAuthor(@PathVariable String author) {
-        Book found = bookRepository.findFirstByAuthor(author);
-        if (found == null) throw new BookNotFoundException();
-        return found;
+        return bookRepository
+                .findFirstByAuthor(author)
+                .orElseThrow(BookNotFoundException::new);
     }
 
     @PostMapping
