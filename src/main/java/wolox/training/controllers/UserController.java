@@ -28,9 +28,9 @@ public class UserController {
 
     @GetMapping("/{username}")
     public User findByName(@PathVariable String username) {
-        User user = userRepository.findByUsername(username);
-        if (user == null) throw new UserNotFoundException();
-        return user;
+        return userRepository
+                .findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
     }
 
     @PostMapping
