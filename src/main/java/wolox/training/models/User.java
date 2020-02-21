@@ -59,7 +59,7 @@ public class User {
     }
 
     public void addBook(Book book) {
-        if(books.contains(book)) throw new BookAlreadyOwnedException(book.getTitle());
+        if(this.books.contains(book)) throw new BookAlreadyOwnedException(book.getTitle());
         this.books.add(book);
     }
 }
