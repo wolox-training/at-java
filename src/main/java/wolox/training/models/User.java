@@ -62,4 +62,9 @@ public class User {
         if(this.books.contains(book)) throw new BookAlreadyOwnedException(book.getTitle());
         this.books.add(book);
     }
+
+    public void removeBook(Book book) {
+        this.books.remove(book);
+    }
+
 }

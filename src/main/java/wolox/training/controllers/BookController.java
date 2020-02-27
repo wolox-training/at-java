@@ -1,7 +1,6 @@
 package wolox.training.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,9 +41,9 @@ public class BookController {
     @PutMapping("/{id}")
     public Book update(@RequestBody Book book, @PathVariable Long id) {
         if (book.getId() != id) {
-            throw new BookIdMismatchException("The id does not match");
+            throw new BookIdMismatchException();
         }
-        if (bookRepository.existsById(id)) {
+        if (!bookRepository.existsById(id)) {
             throw new BookNotFoundException();
         }
 
@@ -53,7 +52,7 @@ public class BookController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        if (bookRepository.existsById(id)) {
+        if (!bookRepository.existsById(id)) {
             throw new BookNotFoundException();
         }
 
