@@ -33,8 +33,8 @@ public class BookController {
     @GetMapping("/{author}")
     @ApiOperation(value = "Given an author returns the book", response = Book.class)
     @ApiResponses(value = {
-            @ApiResponse(code = 200, response = Book.class, message = ""),
-            @ApiResponse(code = 404, message = "Book not found")
+            @ApiResponse(code = 200, response = Book.class, message = "Returns the first book for that author"),
+            @ApiResponse(code = 404, message = "The book was not found")
     })
     public Book findByAuthor(@PathVariable String author) {
         return bookRepository
@@ -44,11 +44,22 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation(value = "Recieves a book to create", response = Book.class)
+    @ApiResponses(value={
+            @ApiResponse(code = 201, response = Book.class, message = "The book was created"),
+            @ApiResponse(code = 400, message = "There was a problem with the recieved data")
+    })
     public Book create(@RequestBody Book book) {
         return bookRepository.save(book);
     }
 
     @PutMapping("/{id}")
+    @ApiOperation(value = "Receives an ID and a book to update", response = Book.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, response = Book.class, message = "The book was found and updated"),
+            @ApiResponse(code = 400, message = "The book id to update does not match the book id sent with data"),
+            @ApiResponse(code = 404, message = "Book not found")
+    })
     public Book update(@RequestBody Book book, @PathVariable Long id) {
         if (book.getId() != id) {
             throw new BookIdMismatchException();
@@ -61,6 +72,12 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
+    @ApiOperation(value = "Given an ID deletes a book")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "The book was deleted successfully"),
+            @ApiResponse(code = 404, message = "The book was not found"),
+            @ApiResponse(code = 400, message = "The book id to update does not match the book id sent with data")
+    })
     public void delete(@PathVariable Long id) {
         if (!bookRepository.existsById(id)) {
             throw new BookNotFoundException();
@@ -70,6 +87,10 @@ public class BookController {
     }
 
     @GetMapping("/greeting")
+    @ApiOperation(value = "Given a name it greets a person")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Says hi!")
+    })
     public String greeting(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
         model.addAttribute("name", name);
         return "greeting";
