@@ -28,9 +28,9 @@ public class UserController {
 
     @GetMapping("/{username}")
     public User findByName(@PathVariable String username) {
-        User user = userRepository.findByUsername(username);
-        if (user == null) throw new UserNotFoundException();
-        return user;
+        return userRepository
+                .findByUsername(username)
+                .orElseThrow(UserNotFoundException::new);
     }
 
     @PostMapping
@@ -41,7 +41,7 @@ public class UserController {
     @PutMapping("/{id}")
     public User update(@RequestBody User user, @PathVariable Long id) {
         if (user.getId() != id) {
-            throw new UserIdMismatchException("The user id does not match");
+            throw new UserIdMismatchException();
         }
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException();

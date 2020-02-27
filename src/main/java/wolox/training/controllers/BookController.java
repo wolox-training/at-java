@@ -37,9 +37,9 @@ public class BookController {
             @ApiResponse(code = 404, message = "Book not found")
     })
     public Book findByAuthor(@PathVariable String author) {
-        Book found = bookRepository.findFirstByAuthor(author);
-        if (found == null) throw new BookNotFoundException();
-        return found;
+        return bookRepository
+                .findFirstByAuthor(author)
+                .orElseThrow(BookNotFoundException::new);
     }
 
     @PostMapping
@@ -51,7 +51,7 @@ public class BookController {
     @PutMapping("/{id}")
     public Book update(@RequestBody Book book, @PathVariable Long id) {
         if (book.getId() != id) {
-            throw new BookIdMismatchException("The book id does not match");
+            throw new BookIdMismatchException();
         }
         if (!bookRepository.existsById(id)) {
             throw new BookNotFoundException();
