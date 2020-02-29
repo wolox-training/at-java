@@ -25,7 +25,8 @@ public class SwaggerConfig {
     }
 
     private ApiInfo apiEndPointsInfo(){
-        return new ApiInfoBuilder().title("Books API rest")
+        return new ApiInfoBuilder()
+                .title("Books API rest")
                 .description("")
                 .contact(new Contact("Ana", "", ""))
                 .license("Apache 2.0")

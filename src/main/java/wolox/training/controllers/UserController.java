@@ -1,6 +1,7 @@
 package wolox.training.controllers;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,10 @@ public class UserController {
             @ApiResponse(code = 200, message = "Returns a user", response = User.class),
             @ApiResponse(code = 404, message = "User was not found")
     })
-    public User findByName(@PathVariable String username) {
+    public User findByName(
+            @ApiParam(value = "User's name", required = true)
+            @PathVariable String username
+    ) {
         return userRepository
                 .findByUsername(username)
                 .orElseThrow(UserNotFoundException::new);
@@ -50,7 +54,10 @@ public class UserController {
             @ApiResponse(code = 201, message = "User created", response = User.class),
             @ApiResponse(code = 400, message = "There was a problem with the recieved data")
     })
-    public User create(@RequestBody User user) {
+    public User create(
+            @ApiParam(value = "The user to be created", required = true)
+            @RequestBody User user
+    ) {
         return userRepository.save(user);
     }
 
@@ -61,7 +68,12 @@ public class UserController {
             @ApiResponse(code = 400, message = "The user id to update does not match the user id sent with data"),
             @ApiResponse(code = 404, message = "User not found")
     })
-    public User update(@RequestBody User user, @PathVariable Long id) {
+    public User update(
+            @ApiParam(value = "The user to be updated", required = true)
+            @RequestBody User user,
+            @ApiParam(value = "The user's ID", required = true)
+            @PathVariable Long id
+    ) {
         if (user.getId() != id) {
             throw new UserIdMismatchException();
         }
@@ -78,7 +90,10 @@ public class UserController {
             @ApiResponse(code = 404, message = "The user was not found"),
             @ApiResponse(code = 400, message = "The user id to update does not match the user id sent with data")
     })
-    public void delete(@PathVariable Long id) {
+    public void delete(
+            @ApiParam(value = "The user ID", required = true)
+            @PathVariable Long id
+    ) {
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException();
         }
@@ -93,7 +108,12 @@ public class UserController {
             @ApiResponse(code = 404, message = "The book or the user were not found"),
             @ApiResponse(code = 409, message = "The user already owns the book")
     })
-    public User addBook(@PathVariable Long id, @PathVariable Long bookId) {
+    public User addBook(
+            @ApiParam(value = "The user ID", required = true)
+            @PathVariable Long id,
+            @ApiParam(value = "The book ID", required = true)
+            @PathVariable Long bookId
+    ) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
         Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
 
@@ -107,7 +127,12 @@ public class UserController {
             @ApiResponse(code = 200, message = "The book was removed from user's library"),
             @ApiResponse(code = 404, message = "The book or the user were not found")
     })
-    public void deleteBook(@PathVariable Long id, @PathVariable Long bookId) {
+    public void deleteBook(
+            @ApiParam(value = "The user ID", required = true)
+            @PathVariable Long id,
+            @ApiParam(value = "The book ID", required = true)
+            @PathVariable Long bookId
+    ) {
         User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
         Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
 
