@@ -8,14 +8,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import lombok.Getter;
+import lombok.AccessLevel;
+import lombok.Data;
 import lombok.Setter;
+import wolox.training.exceptions.ErrorConstats;
 
 @Entity
 @ApiModel(description = "Books on the library")
+@Data
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Setter(AccessLevel.NONE)
     private long id;
 
     @Column()
@@ -46,90 +50,56 @@ public class Book {
     @Column(nullable = false)
     private String isbn;
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
     public void setGenre(String genre) {
         this.genre = genre;
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
     public void setAuthor(String author) {
-        Preconditions.checkNotNull(author);
+        Preconditions.checkNotNull(author, ErrorConstats.FIELD_CANNOT_BE_EMPTY, author);
+        Preconditions.checkArgument(!author.equals(""), ErrorConstats.FIELD_CANNOT_BE_EMPTY, author);
         this.author = author;
     }
 
-    public String getImage() {
-        return image;
-    }
-
     public void setImage(String image) {
-        Preconditions.checkNotNull(image);
+        Preconditions.checkNotNull(image, ErrorConstats.FIELD_CANNOT_BE_EMPTY, image);
+        Preconditions.checkArgument(!image.equals(""), ErrorConstats.FIELD_CANNOT_BE_EMPTY, image);
         this.image = image;
     }
-    public String getTitle() {
-        return title;
-    }
+
     public void setTitle(String title) {
-        Preconditions.checkNotNull(title);
+        Preconditions.checkNotNull(title, ErrorConstats.FIELD_CANNOT_BE_EMPTY, title);
+        Preconditions.checkArgument(!title.equals(""), ErrorConstats.FIELD_CANNOT_BE_EMPTY, title);
         this.title = title;
     }
 
-    public String getSubtitle() {
-        return subtitle;
-    }
-
     public void setSubtitle(String subtitle) {
-        Preconditions.checkNotNull(subtitle);
+        Preconditions.checkNotNull(subtitle, ErrorConstats.FIELD_CANNOT_BE_EMPTY, subtitle);
+        Preconditions.checkArgument(!subtitle.equals(""), ErrorConstats.FIELD_CANNOT_BE_EMPTY, subtitle);
         this.subtitle = subtitle;
     }
 
-    public String getPublisher() {
-        return publisher;
-    }
-
     public void setPublisher(String publisher) {
-        Preconditions.checkNotNull(publisher);
+        Preconditions.checkNotNull(publisher, ErrorConstats.FIELD_CANNOT_BE_EMPTY, publisher);
+        Preconditions.checkArgument(!publisher.equals(""), ErrorConstats.FIELD_CANNOT_BE_EMPTY, publisher);
         this.publisher = publisher;
     }
 
-    public String getYear() {
-        return year;
-    }
-
     public void setYear(String year) {
-        Preconditions.checkNotNull(year);
+        Preconditions.checkNotNull(year, ErrorConstats.FIELD_CANNOT_BE_EMPTY, year);
+        Preconditions.checkArgument(!year.equals(""), ErrorConstats.FIELD_CANNOT_BE_EMPTY, year);
         this.year = year;
     }
 
-    public int getPages() {
-        return pages;
-    }
-
     public void setPages(Integer pages) {
-        Preconditions.checkNotNull(pages);
+        int pageAmount = 10;
+        Preconditions.checkNotNull(pages, ErrorConstats.FIELD_CANNOT_BE_EMPTY, pages);
+        Preconditions.checkArgument(pages < pageAmount, ErrorConstats.MINIMUM_PAGE_AMOUNT_MESSAGE, pageAmount);
         this.pages = pages;
     }
 
-    public String getIsbn() {
-        return isbn;
-    }
-
     public void setIsbn(String isbn) {
-        Preconditions.checkNotNull(isbn);
+        Preconditions.checkNotNull(isbn, ErrorConstats.FIELD_CANNOT_BE_EMPTY, isbn);
+        Preconditions.checkArgument(!isbn.equals(""), ErrorConstats.FIELD_CANNOT_BE_EMPTY, isbn);
         this.isbn = isbn;
     }
-
 }
