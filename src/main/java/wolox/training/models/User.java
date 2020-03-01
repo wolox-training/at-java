@@ -30,7 +30,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Setter(AccessLevel.NONE)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String username;
@@ -45,7 +45,7 @@ public class User {
     @Column(nullable = false)
     private List<Book> books = new ArrayList<>();
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
