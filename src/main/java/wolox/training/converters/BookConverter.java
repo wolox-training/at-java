@@ -1,4 +1,4 @@
-package converters;
+package wolox.training.converters;
 
 import wolox.training.dto.BookDTO;
 import wolox.training.models.Book;

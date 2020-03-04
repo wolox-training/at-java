@@ -1,4 +1,4 @@
-package converters;
+package wolox.training.converters;
 
 import wolox.training.dto.UserDTO;
 import wolox.training.models.User;
