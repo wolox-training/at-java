@@ -1,6 +1,5 @@
 package wolox.training.controllers;
 
-import converters.UserConverter;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -17,8 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import wolox.training.dto.UserDTO;
+import wolox.training.dtoConverters.UserDtoConverter;
+import wolox.training.exceptions.BookIdMismatchException;
 import wolox.training.exceptions.BookNotFoundException;
-import wolox.training.exceptions.UserIdMismatchException;
 import wolox.training.exceptions.UserNotFoundException;
 import wolox.training.models.Book;
 import wolox.training.models.User;
@@ -60,7 +60,7 @@ public class UserController {
             @ApiParam(value = "The user to be created", required = true)
             @RequestBody UserDTO userDTO
     ) {
-        User user = UserConverter.convert(userDTO);
+        User user = UserDtoConverter.convert(userDTO);
         return userRepository.save(user);
     }
 
@@ -77,14 +77,18 @@ public class UserController {
             @ApiParam(value = "The user's ID", required = true)
             @PathVariable Long id
     ) {
-        if (userDTO.getId().equals(id)) {
-            throw new UserIdMismatchException();
+        if (!id.equals(userDTO.getId())) {
+            throw new BookIdMismatchException();
         }
+
         if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException();
+            User newUser = UserDtoConverter.convert(userDTO);
+            return userRepository.save(newUser);
         }
-        User user = UserConverter.convert(userDTO);
-        return userRepository.save(user);
+
+        User user = userRepository.findById(id).orElseThrow(BookNotFoundException::new);
+        User updatedUser = UserDtoConverter.convertExisting(userDTO, user);
+        return userRepository.save(updatedUser);
     }
 
     @DeleteMapping("/{id}")

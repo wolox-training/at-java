@@ -1,6 +1,5 @@
 package wolox.training.controllers;
 
-import converters.BookConverter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import wolox.training.dto.BookDTO;
+import wolox.training.dtoConverters.BookDtoConverter;
 import wolox.training.exceptions.BookIdMismatchException;
 import wolox.training.exceptions.BookNotFoundException;
 import wolox.training.models.Book;
@@ -59,7 +59,7 @@ public class BookController {
             @ApiParam(value = "The book to be created.", required = true)
             @RequestBody BookDTO bookDTO
     ) {
-        Book book = BookConverter.convert(bookDTO);
+        Book book = BookDtoConverter.convert(bookDTO);
         return bookRepository.save(book);
     }
 
@@ -76,16 +76,18 @@ public class BookController {
             @ApiParam(value = "The book ID", required = true, example = "0")
             @PathVariable Long id
     ) {
-        if (bookDTO.getId().equals(id)) {
+        if (!id.equals(bookDTO.getId())) {
             throw new BookIdMismatchException();
         }
 
         if (!bookRepository.existsById(id)) {
-            throw new BookNotFoundException();
+            Book newBook = BookDtoConverter.convert(bookDTO);
+            return bookRepository.save(newBook);
         }
 
-        Book book = BookConverter.convert(bookDTO);
-        return bookRepository.save(book);
+        Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
+        Book updatedBook = BookDtoConverter.convertExisting(bookDTO, book);
+        return bookRepository.save(updatedBook);
     }
 
     @DeleteMapping("/{id}")
