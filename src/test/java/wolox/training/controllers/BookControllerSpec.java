@@ -1,5 +1,7 @@
 package wolox.training.controllers;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
@@ -13,12 +15,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import wolox.training.mocks.MockBook;
+import wolox.training.exceptions.ErrorConstats;
 import wolox.training.mocks.InvalidBook;
+import wolox.training.mocks.MockBook;
 import wolox.training.models.Book;
 import wolox.training.repositories.BookRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import wolox.training.utils.ResponseBodyMatchers;
+import wolox.training.utils.RestUtils;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BookController.class)
@@ -58,13 +62,29 @@ public class BookControllerSpec {
         Book mockBook = MockBook.createOne();
         Mockito.when(repository.save(mockBook)).thenReturn(mockBook);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String bookJSON = objectMapper.writeValueAsString(mockBook);
-
         mvc.perform(MockMvcRequestBuilders.post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(bookJSON))
+                .content(RestUtils.ObjectToStringJSON(mockBook)))
                 .andExpect(status().isCreated())
+                .andExpect(
+                        ResponseBodyMatchers
+                                .responseBody()
+                                .containsObjectAsJson(mockBook, Book.class)
+                );
+    }
+
+    @Test void should_updateBook_when_recievesBookToUpdate () throws Exception {
+        Long bookId = 1L;
+        Book mockBook = MockBook.createOneWithId(bookId);
+
+        Mockito.when(repository.existsById(bookId)).thenReturn(true);
+        Mockito.when(repository.save(mockBook)).thenReturn(mockBook);
+        Mockito.when(repository.findById(bookId)).thenReturn(Optional.of(mockBook));
+
+        mvc.perform(MockMvcRequestBuilders.put("/api/books/" + bookId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(RestUtils.ObjectToStringJSON(mockBook)))
+                .andExpect(status().isOk())
                 .andExpect(
                         ResponseBodyMatchers
                                 .responseBody()
@@ -74,46 +94,34 @@ public class BookControllerSpec {
 
     @Test
     public void should_failToCreateBook_when_bookHasNoAuthor () throws Exception {
-        InvalidBook invalidBook = new InvalidBook();
-        InvalidBook noAuthorBook = invalidBook.bookWithoutAuthor();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String bookJSON = objectMapper.writeValueAsString(noAuthorBook);
+        InvalidBook noAuthorBook = InvalidBook.bookWithoutAuthor();
 
         mvc.perform(MockMvcRequestBuilders.post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(bookJSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test void should_updateBook_when_recievesBookToUpdate () throws Exception {
-        Book mockBook = MockBook.createOne();
-        Mockito.when(repository.existsById(mockBook.getId())).thenReturn(true);
-        Mockito.when(repository.save(mockBook)).thenReturn(mockBook);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String bookJSON = objectMapper.writeValueAsString(mockBook);
-
-        mvc.perform(MockMvcRequestBuilders.put("/api/books/" + mockBook.getId())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(bookJSON))
-                .andExpect(status().isOk())
-                .andExpect(
-                        ResponseBodyMatchers
-                                .responseBody()
-                                .containsObjectAsJson(mockBook, Book.class)
+                .content(RestUtils.ObjectToStringJSON(noAuthorBook)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(
+                        containsString(
+                                String.format(ErrorConstats.FIELD_CANNOT_BE_EMPTY, "author")
+                        ))
                 );
     }
 
-    @Test void should_failToUpdateBook_when_bookIdDoesNotMatchRequestedId () throws Exception {
-        Book mockBook = MockBook.createOne();
+    @Test
+    void should_failToUpdateBook_when_bookIdDoesNotMatchRequestedId () throws Exception {
+        Long bookId = 1L;
+        Book mockBook = MockBook.createOneWithId(bookId);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String bookJSON = objectMapper.writeValueAsString(mockBook);
+        Mockito.when(repository.findById(bookId)).thenReturn(Optional.of(mockBook));
 
-        mvc.perform(MockMvcRequestBuilders.put("/api/books/1")
+        mvc.perform(MockMvcRequestBuilders.put("/api/books/"+ bookId +1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(bookJSON))
-                .andExpect(status().isBadRequest());
+                .content(RestUtils.ObjectToStringJSON(mockBook)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(
+                        containsString(
+                                String.format(ErrorConstats.ID_MISSMATCH_MESSAGE, "book")
+                        ))
+                );
     }
 }

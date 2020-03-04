@@ -1,12 +1,34 @@
 package wolox.training.mocks;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import wolox.training.dto.BookDTO;
 import wolox.training.models.Book;
 
 public class MockBook {
     static public Book createOne(){
         Book mockBook = new Book();
+
+        mockBook.setAuthor("Dumas");
+        mockBook.setGenre("Adventure");
+        mockBook.setTitle("The three musketeers");
+        mockBook.setSubtitle("");
+        mockBook.setImage("http://image.png");
+        mockBook.setPublisher("A. Editors");
+        mockBook.setPages(700);
+        mockBook.setIsbn("9781567673067");
+        mockBook.setYear("1884");
+
+        return mockBook;
+    }
+
+    static public Book createOneWithId(Long id) throws NoSuchFieldException, IllegalAccessException{
+        Book mockBook = new Book();
+        Field fieldId = mockBook.getClass().getDeclaredField("id");
+        fieldId.setAccessible(true);
+        fieldId.set(mockBook, id);
+
         mockBook.setAuthor("Dumas");
         mockBook.setGenre("Adventure");
         mockBook.setTitle("The three musketeers");

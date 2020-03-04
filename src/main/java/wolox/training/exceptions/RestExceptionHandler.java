@@ -1,6 +1,5 @@
 package wolox.training.exceptions;
 
-import javax.persistence.Entity;
 import javax.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +24,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             UserIdMismatchException.class,
             ConstraintViolationException.class,
             DataIntegrityViolationException.class,
-            IllegalArgumentException.class
+            IllegalArgumentException.class,
+            NullPointerException.class
     })
     public ResponseEntity<Object> handleBadRequest(
             Exception ex, WebRequest request) {

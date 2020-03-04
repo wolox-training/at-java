@@ -3,6 +3,7 @@ package wolox.training.mocks;
 import wolox.training.models.Book;
 
 public class InvalidBook extends Book {
+    public void setId(Long id) { this.id = id; }
 
     public void setGenre(String genre) {
         this.genre = genre;
@@ -42,6 +43,7 @@ public class InvalidBook extends Book {
 
     public static InvalidBook bookWithoutAuthor () {
         InvalidBook book = new InvalidBook();
+        book.setId(1L);
         book.setGenre("ScyFy");
         book.setImage("http://image.png");
         book.setTitle("Ubik");

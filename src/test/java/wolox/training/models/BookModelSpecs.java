@@ -18,9 +18,6 @@ import wolox.training.repositories.BookRepository;
 @RunWith(SpringRunner.class)
 public class BookModelSpecs {
     @Autowired
-    private TestEntityManager entityManager;
-
-    @Autowired
     private BookRepository repository;
     @Test
     void should_updateBook_when_recievesBookToUpdate () throws Exception {
