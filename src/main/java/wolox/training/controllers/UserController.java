@@ -25,6 +25,7 @@ import wolox.training.models.User;
 import wolox.training.repositories.BookRepository;
 import wolox.training.repositories.UserRepository;
 
+// TODO change all controllers to return DTO instead of entities
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -56,12 +57,16 @@ public class UserController {
             @ApiResponse(code = 201, message = "User created", response = User.class),
             @ApiResponse(code = 400, message = "There was a problem with the recieved data")
     })
-    public User create(
+    public UserDTO create(
             @ApiParam(value = "The user to be created", required = true)
             @RequestBody UserDTO userDTO
     ) {
-        User user = UserDtoConverter.convert(userDTO);
-        return userRepository.save(user);
+        return UserDtoConverter
+                .convertToDTO(
+                        userRepository.save(
+                                UserDtoConverter.convert(userDTO)
+                        )
+                );
     }
 
     @PutMapping("/{id}")
