@@ -9,30 +9,40 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import wolox.training.exceptions.ErrorConstats;
 import wolox.training.mocks.InvalidBook;
 import wolox.training.mocks.MockBook;
+import wolox.training.mocks.MockUser;
 import wolox.training.models.Book;
+import wolox.training.models.User;
 import wolox.training.repositories.BookRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import wolox.training.repositories.UserRepository;
 import wolox.training.utils.ResponseBodyMatchers;
 import wolox.training.utils.RestUtils;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BookController.class)
+@AutoConfigureMockMvc
 public class BookControllerSpec {
     @Autowired
     private MockMvc mvc;
 
     @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
     private BookRepository repository;
 
+    @WithMockUser()
     @Test
     public void should_getBook_when_authorReceived () throws Exception {
         Book mockBook = MockBook.createOne();
@@ -48,6 +58,7 @@ public class BookControllerSpec {
                 );
     }
 
+    @WithMockUser()
     @Test
     public void should_failToGetBook_when_authorBookDoesNotExist () throws Exception {
         Mockito.when(repository.findFirstByAuthor("Dumas")).thenReturn(Optional.empty());
@@ -57,6 +68,7 @@ public class BookControllerSpec {
                 .andExpect(status().isNotFound());
     }
 
+    @WithMockUser()
     @Test
     public void should_createBook_when_receivesBook () throws Exception {
         Book mockBook = MockBook.createOne();
@@ -73,9 +85,12 @@ public class BookControllerSpec {
                 );
     }
 
-    @Test void should_updateBook_when_recievesBookToUpdate () throws Exception {
+    @Test
+    @WithMockUser()
+    public void should_updateBook_when_recievesBookToUpdate () throws Exception {
         Long bookId = 1L;
         Book mockBook = MockBook.createOneWithId(bookId);
+        User mockUser = MockUser.createOne();
 
         Mockito.when(repository.existsById(bookId)).thenReturn(true);
         Mockito.when(repository.save(mockBook)).thenReturn(mockBook);
@@ -92,6 +107,7 @@ public class BookControllerSpec {
                 );
     }
 
+    @WithMockUser()
     @Test
     public void should_failToCreateBook_when_bookHasNoAuthor () throws Exception {
         InvalidBook noAuthorBook = InvalidBook.bookWithoutAuthor();
@@ -107,6 +123,7 @@ public class BookControllerSpec {
                 );
     }
 
+    @WithMockUser()
     @Test
     void should_failToUpdateBook_when_bookIdDoesNotMatchRequestedId () throws Exception {
         Long bookId = 1L;
