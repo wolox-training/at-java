@@ -141,4 +141,11 @@ public class BookControllerSpec {
                         ))
                 );
     }
+
+    @Test
+    void should_failToUpdateBook_when_UserIsNotAuthenticated () throws Exception {
+        mvc.perform(MockMvcRequestBuilders.put("/api/books/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
+    }
 }
