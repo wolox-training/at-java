@@ -16,24 +16,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import wolox.training.dto.UserDTO;
-import wolox.training.dtoConverters.UserDtoConverter;
 import wolox.training.exceptions.BookIdMismatchException;
-import wolox.training.exceptions.BookNotFoundException;
-import wolox.training.exceptions.UserNotFoundException;
-import wolox.training.models.Book;
 import wolox.training.models.User;
-import wolox.training.repositories.BookRepository;
-import wolox.training.repositories.UserRepository;
+import wolox.training.services.UserService;
 
-// TODO change all controllers to return DTO instead of entities
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private BookRepository bookRepository;
+    private UserService userService;
 
     @GetMapping("/{username}")
     @ApiOperation(value = "It retrieves a user given a user name")
@@ -41,13 +32,11 @@ public class UserController {
             @ApiResponse(code = 200, message = "Returns a user", response = User.class),
             @ApiResponse(code = 404, message = "User was not found")
     })
-    public User findByName(
+    public UserDTO findByName(
             @ApiParam(value = "User's name", required = true)
             @PathVariable String username
     ) {
-        return userRepository
-                .findByUsername(username)
-                .orElseThrow(UserNotFoundException::new);
+        return userService.findByUsername(username);
     }
 
     @PostMapping
@@ -61,12 +50,7 @@ public class UserController {
             @ApiParam(value = "The user to be created", required = true)
             @RequestBody UserDTO userDTO
     ) {
-        return UserDtoConverter
-                .convertToDTO(
-                        userRepository.save(
-                                UserDtoConverter.convert(userDTO)
-                        )
-                );
+        return userService.createUser(userDTO);
     }
 
     @PutMapping("/{id}")
@@ -76,7 +60,7 @@ public class UserController {
             @ApiResponse(code = 400, message = "The user id to update does not match the user id sent with data"),
             @ApiResponse(code = 404, message = "User not found")
     })
-    public User update(
+    public UserDTO update(
             @ApiParam(value = "The user to be updated", required = true)
             @RequestBody UserDTO userDTO,
             @ApiParam(value = "The user's ID", required = true)
@@ -86,14 +70,11 @@ public class UserController {
             throw new BookIdMismatchException();
         }
 
-        if (!userRepository.existsById(id)) {
-            User newUser = UserDtoConverter.convert(userDTO);
-            return userRepository.save(newUser);
+        if (userService.userExistsById(id)) {
+            return userService.updateUser(userDTO);
         }
 
-        User user = userRepository.findById(id).orElseThrow(BookNotFoundException::new);
-        User updatedUser = UserDtoConverter.convertExisting(userDTO, user);
-        return userRepository.save(updatedUser);
+        return userService.createUser(userDTO);
     }
 
     @DeleteMapping("/{id}")
@@ -107,10 +88,7 @@ public class UserController {
             @ApiParam(value = "The user ID", required = true)
             @PathVariable Long id
     ) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException();
-        }
-        userRepository.deleteById(id);
+        userService.deleteUser(id);
     }
 
     @PostMapping("/{id}/books/{bookId}")
@@ -121,17 +99,14 @@ public class UserController {
             @ApiResponse(code = 404, message = "The book or the user were not found"),
             @ApiResponse(code = 409, message = "The user already owns the book")
     })
-    public User addBook(
+    public UserDTO addBook(
             @ApiParam(value = "The user ID", required = true)
             @PathVariable Long id,
             @ApiParam(value = "The book ID", required = true)
             @PathVariable Long bookId
     ) {
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
-        Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
 
-        user.addBook(book);
-        return userRepository.save(user);
+        return userService.addBookToUser(id, bookId);
     }
 
     @DeleteMapping("/{id}/books/{bookId}")
@@ -146,10 +121,6 @@ public class UserController {
             @ApiParam(value = "The book ID", required = true)
             @PathVariable Long bookId
     ) {
-        User user = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
-        Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
-
-        user.removeBook(book);
-        userRepository.save(user);
+        userService.deleteBookFromUser(id, bookId);
     }
 }

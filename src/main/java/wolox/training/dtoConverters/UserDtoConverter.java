@@ -6,7 +6,7 @@ import wolox.training.models.User;
 public class UserDtoConverter {
     private UserDtoConverter() {}
 
-    public static User convert(UserDTO userDTO) {
+    public static User convertDtoToUser(UserDTO userDTO) {
         User user = new User();
 
         user.setUsername(userDTO.getUsername());
@@ -18,7 +18,7 @@ public class UserDtoConverter {
         return user;
     }
 
-    public static User convertExisting(UserDTO userDTO, User user) {
+    public static User convertDtoToExistingUser(UserDTO userDTO, User user) {
         user.setUsername(userDTO.getUsername());
         user.setPassword(userDTO.getPassword());
         user.setName(userDTO.getName());
@@ -28,7 +28,7 @@ public class UserDtoConverter {
         return user;
     }
 
-    public static UserDTO convertToDTO(User user) {
+    public static UserDTO convertUserToDTO(User user) {
         UserDTO userDTO = new UserDTO();
 
         userDTO.setId(user.getId());

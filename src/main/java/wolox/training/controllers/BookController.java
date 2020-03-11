@@ -19,11 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import wolox.training.dto.BookDTO;
-import wolox.training.dtoConverters.BookDtoConverter;
 import wolox.training.exceptions.BookIdMismatchException;
-import wolox.training.exceptions.BookNotFoundException;
 import wolox.training.models.Book;
 import wolox.training.repositories.BookRepository;
+import wolox.training.services.BookService;
 
 @RestController
 @RequestMapping("/api/books")
@@ -31,7 +30,7 @@ import wolox.training.repositories.BookRepository;
 public class BookController {
 
     @Autowired
-    private BookRepository bookRepository;
+    BookService bookService;
 
     @GetMapping("/{author}")
     @ApiOperation(value = "Given an author returns the book", response = Book.class)
@@ -39,13 +38,11 @@ public class BookController {
             @ApiResponse(code = 200, response = Book.class, message = "Returns the first book for that author"),
             @ApiResponse(code = 404, message = "The book was not found")
     })
-    public Book findByAuthor(
+    public BookDTO findByAuthor(
             @ApiParam(value = "The author's name", required = true)
             @PathVariable String author
     ) {
-        return bookRepository
-                .findFirstByAuthor(author)
-                .orElseThrow(BookNotFoundException::new);
+        return bookService.findByAuthor(author);
     }
 
     @PostMapping
@@ -55,12 +52,11 @@ public class BookController {
             @ApiResponse(code = 201, response = Book.class, message = "The book was created"),
             @ApiResponse(code = 400, message = "There was a problem with the recieved data")
     })
-    public Book create(
+    public BookDTO create(
             @ApiParam(value = "The book to be created.", required = true)
             @RequestBody BookDTO bookDTO
     ) {
-        Book book = BookDtoConverter.convert(bookDTO);
-        return bookRepository.save(book);
+        return bookService.createBook(bookDTO);
     }
 
     @PutMapping("/{id}")
@@ -70,7 +66,7 @@ public class BookController {
             @ApiResponse(code = 400, message = "The book id to update does not match the book id sent with data"),
             @ApiResponse(code = 404, message = "Book not found")
     })
-    public Book update(
+    public BookDTO update(
             @ApiParam(value = "The book to be updated", required = true)
             @RequestBody BookDTO bookDTO,
             @ApiParam(value = "The book ID", required = true, example = "0")
@@ -80,14 +76,11 @@ public class BookController {
             throw new BookIdMismatchException();
         }
 
-        if (!bookRepository.existsById(id)) {
-            Book newBook = BookDtoConverter.convert(bookDTO);
-            return bookRepository.save(newBook);
+        if (!bookService.bookExistsById(id)) {
+            return bookService.createBook(bookDTO);
         }
 
-        Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
-        Book updatedBook = BookDtoConverter.convertExisting(bookDTO, book);
-        return bookRepository.save(updatedBook);
+        return bookService.updateBook(bookDTO);
     }
 
     @DeleteMapping("/{id}")
@@ -101,11 +94,7 @@ public class BookController {
             @ApiParam(value = "The book ID", required = true)
             @PathVariable Long id
     ) {
-        if (!bookRepository.existsById(id)) {
-            throw new BookNotFoundException();
-        }
-
-        bookRepository.deleteById(id);
+        bookService.deleteBook(id);
     }
 
     @GetMapping("/greeting")

@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -17,15 +16,16 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import wolox.training.dto.BookDTO;
+import wolox.training.dtoConverters.BookDtoConverter;
+import wolox.training.exceptions.BookNotFoundException;
 import wolox.training.exceptions.ErrorConstats;
 import wolox.training.mocks.InvalidBook;
 import wolox.training.mocks.MockBook;
-import wolox.training.mocks.MockUser;
 import wolox.training.models.Book;
-import wolox.training.models.User;
 import wolox.training.repositories.BookRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import wolox.training.repositories.UserRepository;
+import wolox.training.services.BookService;
 import wolox.training.utils.ResponseBodyMatchers;
 import wolox.training.utils.RestUtils;
 
@@ -42,11 +42,15 @@ public class BookControllerSpec {
     @MockBean
     private BookRepository repository;
 
+    @MockBean
+    private BookService bookService;
+
     @WithMockUser()
     @Test
     public void should_getBook_when_authorReceived () throws Exception {
         Book mockBook = MockBook.createOne();
-        Mockito.when(repository.findFirstByAuthor("Dumas")).thenReturn(Optional.of(mockBook));
+        BookDTO bookDTO = BookDtoConverter.convertBookToDto(mockBook);
+        Mockito.when(bookService.findByAuthor("Dumas")).thenReturn(bookDTO);
 
         mvc.perform(MockMvcRequestBuilders.get("/api/books/Dumas")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -61,7 +65,7 @@ public class BookControllerSpec {
     @WithMockUser()
     @Test
     public void should_failToGetBook_when_authorBookDoesNotExist () throws Exception {
-        Mockito.when(repository.findFirstByAuthor("Dumas")).thenReturn(Optional.empty());
+        Mockito.when(bookService.findByAuthor("Dumas")).thenThrow(new BookNotFoundException());
 
         mvc.perform(MockMvcRequestBuilders.get("/api/books/Dumas")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -72,7 +76,9 @@ public class BookControllerSpec {
     @Test
     public void should_createBook_when_receivesBook () throws Exception {
         Book mockBook = MockBook.createOne();
-        Mockito.when(repository.save(mockBook)).thenReturn(mockBook);
+        BookDTO bookDTO = BookDtoConverter.convertBookToDto(mockBook);
+
+        Mockito.when(bookService.createBook(bookDTO)).thenReturn(bookDTO);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -81,7 +87,7 @@ public class BookControllerSpec {
                 .andExpect(
                         ResponseBodyMatchers
                                 .responseBody()
-                                .containsObjectAsJson(mockBook, Book.class)
+                                .containsObjectAsJson(bookDTO, BookDTO.class)
                 );
     }
 
@@ -90,20 +96,44 @@ public class BookControllerSpec {
     public void should_updateBook_when_recievesBookToUpdate () throws Exception {
         Long bookId = 1L;
         Book mockBook = MockBook.createOneWithId(bookId);
-        User mockUser = MockUser.createOne();
 
-        Mockito.when(repository.existsById(bookId)).thenReturn(true);
-        Mockito.when(repository.save(mockBook)).thenReturn(mockBook);
-        Mockito.when(repository.findById(bookId)).thenReturn(Optional.of(mockBook));
+        BookDTO bookDTO = BookDtoConverter.convertBookToDto(mockBook);
+
+        Mockito.when(bookService.bookExistsById(bookId)).thenReturn(true);
+        Mockito.when(bookService.updateBook(bookDTO)).thenReturn(bookDTO);
+        Mockito.when(bookService.findById(bookId)).thenReturn(bookDTO);
 
         mvc.perform(MockMvcRequestBuilders.put("/api/books/" + bookId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(RestUtils.ObjectToStringJSON(mockBook)))
+                .content(RestUtils.ObjectToStringJSON(bookDTO)))
                 .andExpect(status().isOk())
                 .andExpect(
                         ResponseBodyMatchers
                                 .responseBody()
-                                .containsObjectAsJson(mockBook, Book.class)
+                                .containsObjectAsJson(bookDTO, BookDTO.class)
+                );
+    }
+
+    @Test
+    @WithMockUser()
+    public void should_createBook_when_recievesBookToUpdateThatDoesNotExist () throws Exception {
+        Long bookId = 1L;
+        Book mockBook = MockBook.createOneWithId(bookId);
+
+        BookDTO bookDTO = BookDtoConverter.convertBookToDto(mockBook);
+
+        Mockito.when(bookService.bookExistsById(bookId)).thenReturn(false);
+        Mockito.when(bookService.createBook(bookDTO)).thenReturn(bookDTO);
+        Mockito.when(bookService.findById(bookId)).thenReturn(bookDTO);
+
+        mvc.perform(MockMvcRequestBuilders.put("/api/books/" + bookId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(RestUtils.ObjectToStringJSON(bookDTO)))
+                .andExpect(status().isOk())
+                .andExpect(
+                        ResponseBodyMatchers
+                                .responseBody()
+                                .containsObjectAsJson(bookDTO, BookDTO.class)
                 );
     }
 
@@ -128,12 +158,11 @@ public class BookControllerSpec {
     void should_failToUpdateBook_when_bookIdDoesNotMatchRequestedId () throws Exception {
         Long bookId = 1L;
         Book mockBook = MockBook.createOneWithId(bookId);
-
-        Mockito.when(repository.findById(bookId)).thenReturn(Optional.of(mockBook));
+        BookDTO bookDTO = BookDtoConverter.convertBookToDto(mockBook);
 
         mvc.perform(MockMvcRequestBuilders.put("/api/books/"+ bookId +1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(RestUtils.ObjectToStringJSON(mockBook)))
+                .content(RestUtils.ObjectToStringJSON(bookDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(
                         containsString(
