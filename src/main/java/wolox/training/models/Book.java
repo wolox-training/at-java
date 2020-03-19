@@ -35,7 +35,7 @@ public class Book {
     @Column(nullable = false)
     protected String title;
 
-    @Column(nullable = false)
+    @Column
     protected String subtitle;
 
     @Column(nullable = false)
@@ -51,6 +51,7 @@ public class Book {
     protected String isbn;
 
     public void setGenre(String genre) {
+        Preconditions.checkNotNull(genre, ErrorConstats.FIELD_CANNOT_BE_EMPTY, "genre");
         this.genre = genre;
     }
 
@@ -73,7 +74,6 @@ public class Book {
     }
 
     public void setSubtitle(String subtitle) {
-        Preconditions.checkNotNull(subtitle, ErrorConstats.FIELD_CANNOT_BE_EMPTY, "subtitle");
         this.subtitle = subtitle;
     }
 
