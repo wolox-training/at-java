@@ -28,6 +28,16 @@ public class BookService {
         return BookDtoConverter.convertBookToDto(book);
     }
 
+    public BookDTO findByIsbn (String isbn) {
+        Book book = bookRepository.findByIsbn(isbn)
+                .orElseThrow(BookNotFoundException::new);
+        return BookDtoConverter.convertBookToDto(book);
+    }
+
+    public boolean existsByIsbn(String isbn) {
+        return bookRepository.countByIsbn(isbn) > 0;
+    }
+
     public boolean bookExistsById(Long id) {
         return bookRepository.existsById(id);
     }
@@ -36,6 +46,10 @@ public class BookService {
         Book book = BookDtoConverter.convertDtoToBook(bookDTO);
         bookRepository.save(book);
         return BookDtoConverter.convertBookToDto(book);
+    }
+
+    public Book createBook(Book book) {
+        return bookRepository.save(book);
     }
 
     public BookDTO updateBook(BookDTO bookDTO) {

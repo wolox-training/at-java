@@ -7,7 +7,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,11 +18,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import wolox.training.converters.BookInfoConverter;
 import wolox.training.dto.BookDTO;
+import wolox.training.services.dtos.BookInfoDTO;
 import wolox.training.exceptions.BookIdMismatchException;
+import wolox.training.exceptions.RequiredArgumentException;
 import wolox.training.models.Book;
-import wolox.training.repositories.BookRepository;
 import wolox.training.services.BookService;
+import wolox.training.services.OpenLibraryService;
 
 @RestController
 @RequestMapping("/api/books")
@@ -30,7 +33,10 @@ import wolox.training.services.BookService;
 public class BookController {
 
     @Autowired
-    BookService bookService;
+    private BookService bookService;
+
+    @Autowired
+    private OpenLibraryService openLibraryService;
 
     @GetMapping("/{author}")
     @ApiOperation(value = "Given an author returns the book", response = Book.class)
@@ -97,17 +103,28 @@ public class BookController {
         bookService.deleteBook(id);
     }
 
-    @GetMapping("/greeting")
-    @ApiOperation(value = "Given a name it greets a person.")
+    @GetMapping(value = "/")
+    @ApiOperation(value = "Given an isbn returns a book")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Says hi!")
+            @ApiResponse(code = 200, message = "Returns the book"),
+            @ApiResponse(code = 201, message = "Creates the book"),
+            @ApiResponse(code = 404, message = "The book was not found")
     })
-    public String greeting(
-            @ApiParam(value = "A person's first name.")
-            @RequestParam(name="name", required=false, defaultValue="World") String name,
-            Model model
-    ) {
-        model.addAttribute("name", name);
-        return "greeting";
+    public ResponseEntity<BookInfoDTO> getBookBy(
+            @ApiParam(value = "The book ID", required = true)
+            @RequestParam String isbn
+    ) throws Exception{
+        if (isbn.isEmpty()) {
+            throw new RequiredArgumentException();
+        }
+
+        if (bookService.existsByIsbn(isbn)) {
+            BookDTO bookDTO = bookService.findByIsbn(isbn);
+            BookInfoDTO bookInfoDTO = BookInfoConverter.convertBookDtoToBookInfoDto(bookDTO);
+            return new ResponseEntity<>(bookInfoDTO, HttpStatus.OK);
+        }
+
+        BookInfoDTO openLibraryBook = openLibraryService.bookInfo(isbn);
+        return new ResponseEntity<>(openLibraryBook, HttpStatus.CREATED);
     }
 }

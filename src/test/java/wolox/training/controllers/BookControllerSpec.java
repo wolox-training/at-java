@@ -20,12 +20,14 @@ import wolox.training.dto.BookDTO;
 import wolox.training.dtoConverters.BookDtoConverter;
 import wolox.training.exceptions.BookNotFoundException;
 import wolox.training.exceptions.ErrorConstats;
+import wolox.training.exceptions.RequiredArgumentException;
 import wolox.training.mocks.InvalidBook;
 import wolox.training.mocks.MockBook;
 import wolox.training.models.Book;
 import wolox.training.repositories.BookRepository;
 import wolox.training.repositories.UserRepository;
 import wolox.training.services.BookService;
+import wolox.training.services.OpenLibraryService;
 import wolox.training.utils.ResponseBodyMatchers;
 import wolox.training.utils.RestUtils;
 
@@ -44,6 +46,9 @@ public class BookControllerSpec {
 
     @MockBean
     private BookService bookService;
+
+    @MockBean
+    private OpenLibraryService openLibraryService;
 
     @WithMockUser()
     @Test
@@ -141,6 +146,9 @@ public class BookControllerSpec {
     @Test
     public void should_failToCreateBook_when_bookHasNoAuthor () throws Exception {
         InvalidBook noAuthorBook = InvalidBook.bookWithoutAuthor();
+        BookDTO bookDTO = BookDtoConverter.convertBookToDto(noAuthorBook);
+        Mockito.when(bookService.createBook(bookDTO))
+                .thenThrow(new IllegalArgumentException("The field author cannot be empty."));
 
         mvc.perform(MockMvcRequestBuilders.post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)

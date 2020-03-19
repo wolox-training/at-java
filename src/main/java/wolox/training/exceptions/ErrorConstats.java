@@ -9,4 +9,5 @@ public class ErrorConstats {
     public static final String MINIMUM_PAGE_AMOUNT_MESSAGE = "The book must have at least %s pages";
     public static final String INVALID_DATE = "The birthdate should be before than today";
     public static final String WRONG_CREDENTIALS_MESSAGE = "The password is incorrect";
+    public static final String REQUEST_EXCEPTION = "There was an error with the external request";
 }

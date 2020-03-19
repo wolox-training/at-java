@@ -24,12 +24,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             UserIdMismatchException.class,
             ConstraintViolationException.class,
             DataIntegrityViolationException.class,
-            IllegalArgumentException.class,
-            NullPointerException.class
+            IllegalArgumentException.class
     })
     public ResponseEntity<Object> handleBadRequest(
             Exception ex, WebRequest request) {
         return handleExceptionInternal(ex, ex.getLocalizedMessage(),
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler({RequestException.class})
+    public ResponseEntity<Object> handleRequestException(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, ex.getLocalizedMessage(),
+                new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 }
