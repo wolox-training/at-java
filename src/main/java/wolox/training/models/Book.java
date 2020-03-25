@@ -20,35 +20,35 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Setter(AccessLevel.NONE)
-    private long id;
+    protected Long id;
 
     @Column()
-    private String genre;
+    protected String genre;
 
     @ApiModelProperty(notes = "The book's author")
     @Column(nullable = false)
-    private String author;
+    protected String author;
 
     @Column(nullable = false)
-    private String image;
+    protected String image;
 
     @Column(nullable = false)
-    private String title;
+    protected String title;
 
     @Column(nullable = false)
-    private String subtitle;
+    protected String subtitle;
 
     @Column(nullable = false)
-    private String publisher;
+    protected String publisher;
 
     @Column(nullable = false)
-    private String year;
+    protected String year;
 
     @Column(nullable = false)
-    private Integer pages;
+    protected Integer pages;
 
     @Column(nullable = false)
-    private String isbn;
+    protected String isbn;
 
     public void setGenre(String genre) {
         this.genre = genre;
@@ -74,7 +74,6 @@ public class Book {
 
     public void setSubtitle(String subtitle) {
         Preconditions.checkNotNull(subtitle, ErrorConstats.FIELD_CANNOT_BE_EMPTY, "subtitle");
-        Preconditions.checkArgument(!subtitle.equals(""), ErrorConstats.FIELD_CANNOT_BE_EMPTY, "subtitle");
         this.subtitle = subtitle;
     }
 
@@ -93,7 +92,7 @@ public class Book {
     public void setPages(Integer pages) {
         int pageAmount = 10;
         Preconditions.checkNotNull(pages, ErrorConstats.FIELD_CANNOT_BE_EMPTY, "pages");
-        Preconditions.checkArgument(pages < pageAmount, ErrorConstats.MINIMUM_PAGE_AMOUNT_MESSAGE, pageAmount);
+        Preconditions.checkArgument(pages > pageAmount, ErrorConstats.MINIMUM_PAGE_AMOUNT_MESSAGE, pageAmount);
         this.pages = pages;
     }
 

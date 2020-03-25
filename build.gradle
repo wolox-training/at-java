@@ -32,6 +32,7 @@ dependencies {
 
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
     testCompile 'com.h2database:h2:1.4.200'
+    testCompile 'javax.inject:javax.inject:1'
 
     compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
@@ -45,6 +46,10 @@ dependencies {
     compile 'org.springframework.plugin:spring-plugin-core:1.2.0.RELEASE'
 
     compile group: 'com.google.guava', name: 'guava', version: '27.0-jre'
+    implementation 'junit:junit:4.12'
+
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+    implementation 'junit:junit:4.12'
 }
 
 test {
