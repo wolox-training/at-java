@@ -14,6 +14,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import wolox.training.controllers.BookController;
 import wolox.training.mocks.MockBook;
 import wolox.training.models.Book;
 import wolox.training.repositories.BookRepository;
@@ -47,5 +48,12 @@ public class BookIntegrationTests {
                                 .responseBody()
                                 .containsObjectAsJson(mockBook, Book.class)
                 );
+    }
+
+    @Test
+    void should_failToUpdateBook_when_UserIsNotAuthenticated () throws Exception {
+        mvc.perform(MockMvcRequestBuilders.put("/api/books/1")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 }

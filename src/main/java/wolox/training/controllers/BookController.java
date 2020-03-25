@@ -38,6 +38,11 @@ public class BookController {
     @Autowired
     private OpenLibraryService openLibraryService;
 
+    BookController(BookService bookService, OpenLibraryService openLibraryService){
+        this.bookService = bookService;
+        this.openLibraryService = openLibraryService;
+    }
+
     @GetMapping("/{author}")
     @ApiOperation(value = "Given an author returns the book", response = Book.class)
     @ApiResponses(value = {
