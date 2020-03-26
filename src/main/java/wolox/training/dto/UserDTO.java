@@ -10,6 +10,7 @@ import wolox.training.models.Book;
 public class UserDTO {
     private Long id;
     private String username;
+    private String password;
     private String name;
     private LocalDate birthdate;
     private List<Book> books = new ArrayList<>();

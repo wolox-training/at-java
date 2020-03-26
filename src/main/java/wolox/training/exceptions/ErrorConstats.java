@@ -8,4 +8,5 @@ public class ErrorConstats {
     public static final String FIELD_CANNOT_BE_EMPTY = "The field %s cannot be empty.";
     public static final String MINIMUM_PAGE_AMOUNT_MESSAGE = "The book must have at least %s pages";
     public static final String INVALID_DATE = "The birthdate should be before than today";
+    public static final String WRONG_CREDENTIALS_MESSAGE = "The password is incorrect";
 }

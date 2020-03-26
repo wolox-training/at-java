@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler({ BookNotFoundException.class })
+    @ExceptionHandler({ BookNotFoundException.class, UserNotFoundException.class })
     protected ResponseEntity<Object> handleNotFound(
             Exception ex, WebRequest request) {
         return handleExceptionInternal(ex, ex.getLocalizedMessage(),
@@ -31,12 +31,5 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             Exception ex, WebRequest request) {
         return handleExceptionInternal(ex, ex.getLocalizedMessage(),
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-    }
-
-    @ExceptionHandler({UserNotFoundException.class})
-    protected ResponseEntity<Object> handleNotFoundUser(
-            Exception ex, WebRequest request) {
-        return handleExceptionInternal(ex, ex.getLocalizedMessage(),
-                new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 }
