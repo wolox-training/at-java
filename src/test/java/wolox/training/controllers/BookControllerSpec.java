@@ -2,9 +2,13 @@ package wolox.training.controllers;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -20,7 +24,9 @@ import wolox.training.services.BookService;
 import wolox.training.services.OpenLibraryService;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@TestInstance(Lifecycle.PER_CLASS)
+@AutoConfigureTestDatabase
 public class BookControllerSpec {
     @MockBean
     private BookService bookService;
@@ -39,7 +45,6 @@ public class BookControllerSpec {
         Assert.assertEquals(bookDTO, result);
     }
 
-    @WithMockUser()
     @Test
     public void should_failToGetBook_when_authorBookDoesNotExist () throws Exception {
         BookController bookController = new BookController(bookService, openLibraryService);
@@ -48,13 +53,13 @@ public class BookControllerSpec {
         try {
             bookController.findByAuthor("Dumas");
         } catch (BookNotFoundException ignored) {
+            return;
         } catch (Exception ex) {
             Assert.fail();
         }
         Assert.fail();
     }
 
-    @WithMockUser()
     @Test
     public void should_createBook_when_receivesBook () throws Exception {
         BookController bookController = new BookController(bookService, openLibraryService);
@@ -68,7 +73,6 @@ public class BookControllerSpec {
     }
 
     @Test
-    @WithMockUser()
     public void should_updateBook_when_recievesBookToUpdate () throws Exception {
         BookController bookController = new BookController(bookService, openLibraryService);
         Long bookId = 1L;
@@ -85,7 +89,6 @@ public class BookControllerSpec {
     }
 
     @Test
-    @WithMockUser()
     public void should_createBook_when_recievesBookToUpdateThatDoesNotExist () throws Exception {
         BookController bookController = new BookController(bookService, openLibraryService);
         Long bookId = 1L;
@@ -102,7 +105,6 @@ public class BookControllerSpec {
         Assert.assertEquals(bookDTO, result);
     }
 
-    @WithMockUser()
     @Test
     public void should_failToCreateBook_when_bookHasNoAuthor () throws Exception {
         BookController bookController = new BookController(bookService, openLibraryService);
@@ -115,6 +117,7 @@ public class BookControllerSpec {
         try {
             bookController.create(bookDTO);
         } catch (IllegalArgumentException ignored) {
+            return;
         } catch (Exception ex){
             Assert.assertEquals(ex.getMessage(), errorMessage);
             Assert.fail();
@@ -122,7 +125,6 @@ public class BookControllerSpec {
         Assert.fail();
     }
 
-    @WithMockUser()
     @Test
     void should_failToUpdateBook_when_bookIdDoesNotMatchRequestedId () throws Exception {
         BookController bookController = new BookController(bookService, openLibraryService);

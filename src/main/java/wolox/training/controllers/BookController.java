@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -112,14 +113,14 @@ public class BookController {
     @ApiOperation(value = "Given an isbn returns a book")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Returns the book"),
-            @ApiResponse(code = 201, message = "Creates the book"),
+            @ApiResponse(code = 201, message = "Creates and returns the book"),
             @ApiResponse(code = 404, message = "The book was not found")
     })
     public ResponseEntity<BookInfoDTO> getBookBy(
-            @ApiParam(value = "The book ID", required = true)
+            @ApiParam(value = "The book isbn", required = true)
             @RequestParam String isbn
     ) throws Exception{
-        if (isbn.isEmpty()) {
+        if (StringUtils.isEmpty(isbn)) {
             throw new RequiredArgumentException();
         }
 

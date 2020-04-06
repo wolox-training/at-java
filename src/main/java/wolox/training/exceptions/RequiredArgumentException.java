@@ -5,5 +5,4 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Missing required field")
 public class RequiredArgumentException extends RuntimeException {
-
 }

@@ -7,13 +7,13 @@ import wolox.training.models.Book;
 import wolox.training.models.User;
 
 public class MockUser {
-    static public User createOne() {
+    static public User createOne(String password) {
         User user = new User();
         List<Book> books = new ArrayList<>();
         LocalDate birthdate = LocalDate.of(1981, 8, 26);
 
         user.setUsername("pepe");
-        user.setPassword("123");
+        user.setPassword(password);
         user.setName("Pepe");
         user.setBirthdate(birthdate);
         user.setBooks(books);

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import wolox.training.dto.BookDTO;
+import wolox.training.models.Book;
 import wolox.training.services.connectors.dtos.Author;
 import wolox.training.services.connectors.dtos.OpenLibraryResponse;
 import wolox.training.services.dtos.BookInfoDTO;
@@ -28,6 +29,7 @@ public class BookInfoConverter {
         bookInfoDTO.setTitle(bookDTO.getTitle());
         bookInfoDTO.setSubtitle(bookDTO.getSubtitle());
         bookInfoDTO.setIsbn(bookDTO.getIsbn());
+        bookInfoDTO.setPages(bookDTO.getPages());
 
         return bookInfoDTO;
     }
@@ -57,6 +59,27 @@ public class BookInfoConverter {
                 .map(Author::getName)
                 .collect(Collectors.toList());
         bookInfoDTO.setAuthors(authors);
+
+        return bookInfoDTO;
+    }
+
+    public static BookInfoDTO convertBookToBookInfoDto(Book book) {
+        BookInfoDTO bookInfoDTO = new BookInfoDTO();
+
+        String[] authors = book.getAuthor().split("\\|");
+        ArrayList<String> authorList = new ArrayList<>(Arrays.asList(authors));
+        bookInfoDTO.setAuthors(authorList);
+
+        String[] publishers = book.getPublisher().split("\\|");
+        ArrayList<String> publishersList = new ArrayList<>(Arrays.asList(publishers));
+        bookInfoDTO.setPublishers(publishersList);
+
+        bookInfoDTO.setId(book.getId());
+        bookInfoDTO.setPublishDate(book.getYear());
+        bookInfoDTO.setTitle(book.getTitle());
+        bookInfoDTO.setSubtitle(book.getSubtitle());
+        bookInfoDTO.setIsbn(book.getIsbn());
+        bookInfoDTO.setPages(book.getPages());
 
         return bookInfoDTO;
     }
